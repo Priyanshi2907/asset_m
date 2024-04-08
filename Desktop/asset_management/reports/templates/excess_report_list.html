@@ -151,30 +151,31 @@
                     <input type="checkbox" id="masterCheckbox" onclick="selectAllCheckboxes(this)">
                 </th> {% endcomment %}
                 <th>Serial No.</th>
-                <th>Category</th>
-                {% comment %} <th>Order Number</th> {% endcomment %}
-                <th>Original Order count</th>
+               
+                <th>Order Number</th>
+                <th>Requirement No</th>
+                {% comment %} <th>Original Order count</th>
                 <th>Requirement count</th>
                 <th>Excess</th>
-                <th>Shortfall</th>
+                <th>Shortfall</th> {% endcomment %}
                 {% comment %} <th>Rented Out</th>
                 <th>R & M</th> {% endcomment %}
             </tr>
         </thead>
 
         <tbody>
-            {% for m in merged %}
+            {% for m in order %}
             <tr>
                 {% comment %} <td class="checkbox-column"><input type="checkbox" name="asset_id" value="{{ m.id }}"></td> {% endcomment %}
                 <td>{{forloop.counter}}</td>
-                {% comment %} {% if m.==m.%} {% endcomment %}
-                {% comment %} <td>{{m.id}}</td>     <td class="tbname"><a href="/asset_management/orders-info/{{m.id}}/">{{m.id}}</a></td> {% endcomment %}
-                <td>{{m.category}}</td>
+                <td class="tbname"><a href="/asset_management/excess-shortfall/{{m.id}}/">{{m.id}}</td> 
+                <td>{{m.req_id.id}}</td>  {% comment %}  <td class="tbname"><a href="/asset_management/orders-info/{{m.id}}/">{{m.id}}</a></td> {% endcomment %}
+                {% comment %} <td>{{m.category}}</td>
                 <td>{{m.cat_count}}</td>
-                <td>{{m.req_count}}</td>
+                <td>{{m.req_count}}</td> {% endcomment %}
                 {% comment %} <td>{% for i in merged %}{{i.req_count}}{% endfor %}</td>    {% endcomment %}
-                <td>{{m.excess}}</td>  
-                <td>{{m.shortfall}}</td>  
+                {% comment %} <td>{{m.excess}}</td>  
+                <td>{{m.shortfall}}</td>   {% endcomment %}
             </tr>
             {% endfor %}
         </tbody>

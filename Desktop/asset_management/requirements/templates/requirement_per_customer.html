@@ -116,14 +116,14 @@
                 <th>Description </th>
                 <th>Brand</th>
                 <th>Model</th>
-                <th>Quantity</th>
+                
                 
                
             </tr>
         </thead>
 
         <tbody>
-            {% for m in all_asset_of_an_order %}
+            {% for m in customer_obj %}
             <tr>
                 <td>{{m.r_serialno}}</td>
                 {% comment %} <td id="id_{{m.id}}">{{m.id}}</td> {% endcomment %}
@@ -132,9 +132,7 @@
                 <td>{{m.r_description}} </td>
                 <td >{{m.r_brand}}</td>
                 <td>{{m.r_modelno}}</td> 
-                <td>{{m.quantity}}</td>              
-                
-                
+   
             </tr>
             {% endfor %}
             <!-- Add more rows as needed -->

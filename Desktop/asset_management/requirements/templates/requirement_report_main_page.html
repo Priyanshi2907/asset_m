@@ -133,7 +133,8 @@
         <thead>
             <tr>
                 {% comment %} <th class="checkbox-column" style="border-radius: 10px 0 0 0;"><input type="checkbox" id="masterCheckbox" onclick="selectAllCheckboxes(this)"></th> {% endcomment %}
-                <th>S.NO</th>
+                <th>Requirement.NO</th>
+                <th>Customer.NO</th>
                 <th>Customer name </th>
                 <th> Order Start Date</th>
                 <th>Order End Date</th>
@@ -148,8 +149,9 @@
             <tr>
               {% comment %} {% if forloop.counter|add:0 ==id %} {% endcomment %}
                 {% comment %} <td class="checkbox-column"><input type="checkbox" name="order_id" value="{{ m.id }}"></td> {% endcomment %}
-                <td class="tbname">{{forloop.counter}}</td>
-                <td class="tbname"><a href="/asset_management/requirement-per-customer/{{m.id}}/">{{m.r_customer}}</a></td>
+                <td class="tbname">{{m.id}}</td>
+                <td class="tbname">{{m.customer__id}}</td>
+                <td class="tbname"><a href="/asset_management/requirement-per-customer/{{m.customer__id}}/">{{m.customer__customer}}</a></td>
               {% comment %} {% else %}   {% endcomment %}
                 {% comment %} <td class="tbname">{{forloop.counter}}</td>
                 <td class="tbname"><a href="/asset_management/requirement-per-customer/">{{m.r_customer}}</a></td> {% endcomment %}

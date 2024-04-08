@@ -18,22 +18,11 @@
     <div class="assetheaderbuttones">
         <h1>Requirement form</h1>
         
-        
-    <form action="{% url 'save-requirement-form' %}" method="post">
-       {%csrf_token%}
-        <div class="assebutton" style="gap: 20px; display: flex;">
-            <button type="button" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-placement="bottom"
-                data-bs-title="Add assets in bulk from CSV file." 
-                onclick="document.getElementById('fileInputs').click()">Import Requirements</button>
-            <input type="file" id="fileInputs" accept=".xlsx, .csv" onchange="uploadFiles()" style="display: none;">
-
-            <div class="asset-tablebtn">
-                
-                    <button style="height: 45px;">
-                        <a href="">CANCEL</a>
-                    </button>
-                
-            </div>
+        <form action="{% url 'save-requirement-form' %}" method="post" enctype="multipart/form-data">
+            {%csrf_token%}
+            {{form.errors}}
+    
+         <div class="assebutton" style="gap: 20px; display: flex;">
             <button type="submit">
                 <svg xmlns="http://www.w3.org/2000/svg"
                 width="20" height="20" viewBox="0 0 24 24"
@@ -42,6 +31,16 @@
                 <path d="M9.999 13.587 7.7 11.292l-1.412 1.416 3.713 3.705 6.706-6.706-1.414-1.414z"></path>
                 </svg>Save
             </button>
+
+            
+            <div class="asset-tablebtn">
+                
+                    <button style="height: 45px;">
+                        <a href="">CANCEL</a>
+                    </button>
+                
+            </div>
+            
     
         </div>
        
@@ -63,23 +62,23 @@
         <div class="assetform-input">
             <label for="">CUSTOMER</label>
                 <select name="customer" id="customer_dropdown" style="width: 60%; height:40px; border-radius:5px" required>
-                    <option value=" ">--Select--</option>
+                    <option value="">--Select--</option>
                     {% for m in customer %}
-                        <option value="{{ m.customer }}">{{ m.customer }}</option>
+                        <option value="{{ m.id }}">{{ m.customer }}</option>
                     {% endfor %}
                 </select>
         </div>
         <div class="assetform-input">
             <label for="">ORDER START DATE </label>
-            <input type="date"  name="out_date_and_time" id="" >
+            <input type="date"  name="r_orderstartdate" id="" required>
         </div>
         <div class="assetform-input">
             <label for="">ORDER DEPLOYMENT DATE</label>
-            <input type="date" name="deployment_date" id="" >
+            <input type="date" name="r_orderdeploydate" id="" >
         </div>
         <div class="assetform-input">
             <label for="">ORDER RETURN DATE<span></span></label>
-            <input id="returnDate" type="date" name="return_date" >
+            <input  type="date"   name="r_orderenddate" id="returnDate" >
         </div>
         <script>
             var today = new Date().toISOString().split('T')[0];
@@ -88,13 +87,18 @@
         </script>
         <div class="assetform-input">
             <label for="">ORDER LOCATION</label>
-            <input type="text" name="location" id="" >
+            <input type="text" name="r_loc" id="" >
         </div>
+        <div class="assetform-input">
+            <label for="">upload Requirements</label>
+            <input type="file" name="csv_file" required>
+        </div>
+        
     </div>
 
 </section>
 
-<div class="assetform-heading">
+{% comment %} <div class="assetform-heading">
     <h4>Add Asset</h4>
 </div>
 
@@ -105,36 +109,33 @@
 
         <div class="assetform-input">
             <label for="">Category<span>*</span></label>
-            <input type="text" name="category" id="" required>
+            <input type="text" name="category" id="" >
         </div>
         <div class="assetform-input">
             <label for="">Sub Category<span>*</span></label>
-            <input type="text"  name="subcategory" id="" required>
+            <input type="text"  name="subcategory" id="" >
         </div>
         <div class="assetform-input">
             <label for="">Description<span>*</span></label>
-            <input type="text" name="description" id="" required>
+            <input type="text" name="description" id="" >
         </div>
         <div class="assetform-input">
             <label for="">Model Number<span>*</span></label>
-            <input type="text" name="model_no" id="" required>
+            <input type="text" name="model_no" id="" >
         </div>
     
         <div class="assetform-input">
             <label for="">Brand<span>*</span></label>
-            <input type="text" name="brand" id="" required>
+            <input type="text" name="brand" id="" >
         </div>
         <div class="assetform-input">
             <label for="">Serial Number<span>*</span></label>
-            <input type="text"  name="serial_no" id="" required>
+            <input type="text"  name="serial_no" id="" >
         </div>
-        <div class="assetform-input">
-            <label for="">Quantity<span>*</span></label>
-            <input type="text"  name="quantity" id="" required>
-        </div>
+        
     </div>
     
-</section>
+</section> {% endcomment %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     function goback(){

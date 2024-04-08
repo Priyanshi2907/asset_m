@@ -13,7 +13,7 @@ path("requirement-per-customer/<int:id>/",requirement_per_customer, name= "requi
 path("requirement-asset/",requirement_asset_form, name= "requirement_asset"),
 
 #requirement form
-path("save-requirement-form",requirement_save_form, name= "save-requirement-form"),
+path("save-requirement-form/",requirement_save_form, name= "save-requirement-form"),
 
 
 

@@ -30,6 +30,7 @@ from reportlab.platypus.tables import Table, TableStyle, colors
 from django.forms.models import model_to_dict
 import random
 from asset_master.models import *
+from requirements.models import *
 
 
 
@@ -611,14 +612,18 @@ def AssetMasterOrderPostView(request):
         selectedOrderIdsList = selectedOrderIds.split(",")
         request.session['selectedOrderIdsList'] = selectedOrderIdsList
         customer = CustomerDetail.objects.all()
+        requirement=RequirementDetail.objects.all()
         ctx['customer'] = customer
+        ctx['requirement']=requirement
         return render(request,'order_form.html', ctx)
 
     else:
         if request.method == 'POST':
             selectedOrderIdsList = request.session['selectedOrderIdsList']
             customer_id = int(request.POST.get('customer_id'))
+            req_id=int(request.POST.get('req_id'))
             customer_object = CustomerDetail.objects.filter(id=customer_id).first()
+            req_object=RequirementDetail.objects.filter(id=req_id).first()
 
             price = request.POST.get('price') or None
             deployment_date = request.POST.get('deployment_date') or None
@@ -650,6 +655,7 @@ def AssetMasterOrderPostView(request):
        
             order_detail = OrderDetail.objects.create(
                 customer_id=customer_object,
+                req_id=req_object,
                 deployment_date=deployment_date,
                 invoice_number=invoice_number,
                 mode_of_dispatch=mode_of_dispatch,

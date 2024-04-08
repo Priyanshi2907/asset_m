@@ -4,6 +4,8 @@ from reports.views import *
 urlpatterns = [
     path('assets-reports-list/', asset_reports_table, name='asset_reports_table'),
 
+    path('excess-shortfall/<int:id>/', excess_shortfall, name='excess_shortfall'),
+
     #Asset Report main page...
     path('assets-reports-main-page/', asset_report_main_page, name='asset_report_main_page'),
 

@@ -647,22 +647,27 @@ def excess_report_list(request):
     # asset_count=OrderDetail.objects.filter().values('assets__category').annotate(Count='assets__category')
     # print(asset_count)
     Requiremnt_asset=RequirementDetail.objects.values('id','r_category','r_description','r_serialno',
-                                'r_modelno', 'r_brand','quantity' )
+                                'r_modelno', 'r_brand' )
     asset_count=OrderDetail.objects.values('assets__category').annotate(count=Count('assets__category'))
-    order=OrderDetail.objects.values('id','assets__category')
+    requirement_count=RequirementDetail.objects.values('id').annotate(total=Count('id'))
+    order=OrderDetail.objects.all().order_by('-id')
     # for m in order:
     #     all_asset_of_an_order=OrderDetail.objects.filter(id=m['id']).values('assets__id',  'assets__category',
     #                                                                          'assets__description', 'assets__brand', 'assets__serial_no', 'assets__model_no')
     #     asset_count=all_asset_of_an_order.count()
-    #     orders=OrderDetail.objects.values('id').annotate(asset_count=Count('assets__id'))
+    orders=OrderDetail.objects.values('id').annotate(asset_count=Count('assets__id'))
+    req=RequirementDetail.objects.values('id')
     #     print(asset_count)
     #     for r in Requiremnt_asset:
     #         if m['assets__category']== r['r_category']:
     #              merged_data.append({
     #                  **{"req_count":r['quantity']},
     #                 **{'orders':orders}})
-        # ctx={'orders':orders,
-             
+   
+    ctx={'order':order}
+       
+  
+    
          
         #   }
     
@@ -676,19 +681,18 @@ def excess_report_list(request):
                                 'model_no', 'brand', 'add_to_order')
     
     Requiremnt_asset=RequirementDetail.objects.values('id','r_category','r_description','r_serialno',
-                                'r_modelno', 'r_brand','quantity' )
+                                'r_modelno', 'r_brand')
     categories_count= AssetMaster.objects.values('category').annotate(category_count=Count('category'))
-    requirement_count = RequirementDetail.objects.values('r_category').annotate(requirement_count=Count('quantity'))
     
-    for m in categories_count:
-       for r in  Requiremnt_asset:
-           if (m["category"] == r["r_category"]) :
-               merged_data.append({
-                   **{'category':m['category']}, 
-                   **{'cat_count':m['category_count']},
-                   **{'req_count':r['quantity']},
-                   **{'excess':m['category_count']-r['quantity'] if m['category_count']>r['quantity'] else "--"},
-                   **{'shortfall':r['quantity']-m['category_count'] if r['quantity']>m['category_count'] else "--"}})
+    # for m in categories_count:
+    #    for r in  Requiremnt_asset:
+    #        if (m["category"] == r["r_category"]) :
+    #            merged_data.append({
+    #                **{'category':m['category']}, 
+    #                **{'cat_count':m['category_count']},
+    #                **{'req_count':r['quantity']},
+    #                **{'excess':m['category_count']-r['quantity'] if m['category_count']>r['quantity'] else "--"},
+    #                **{'shortfall':r['quantity']-m['category_count'] if r['quantity']>m['category_count'] else "--"}})
                
         # req_count = requirement_count.filter(r_category=m['category']).order_by(
         #     'r_category')
@@ -697,9 +701,7 @@ def excess_report_list(request):
         #     merged_data.append({**{'category':m['category']}, **{'cat_count':m['category_count']},**{'req_count':req_count[requirement_count]},**{'excess':excess if excess >0 else 0,}})
         # else:
         #     merged_data.append({**{'category':m['category']}, **{'cat_count':m['category_count']},**{'req_count':0},**{'excess':m['category_count']}})
-    ctx={
-        "merged":merged_data,
-    }
+    
     return render(request,'excess_report_list.html',ctx )
 
     # for i in categories_with_total_asset_count:
@@ -767,3 +769,38 @@ def excess_report_list(request):
     #     return response
 
     # return render(request,"excess_report_list.html",ctx)
+
+def excess_shortfall(request,id):
+    merged_data=[]
+    ctx={}
+    order_info=OrderDetail.objects.filter(id=id)
+    order_category=OrderDetail.objects.filter(id=id).values('assets__category').distinct().annotate(category_count=Count('assets__category'))
+    requirement_category=RequirementDetail.objects.values('r_category').distinct().annotate(req_count=Count('r_category'))
+    for m in order_category:
+        for r in requirement_category:
+            if r['r_category']==m['assets__category'] :
+             merged_data.append({
+                    **{'category':m['assets__category']}, 
+                    **{'cat_count':m['category_count']},
+                    **{'req_count':r['req_count']},
+                    **{'excess':m['category_count']-r['req_count'] if m['category_count']>r['req_count'] else "--"},
+                    **{'shortfall':r['req_count']-m['category_count'] if r['req_count']>m['category_count'] else "--"}
+    })
+            else:
+             merged_data.append({
+                **{'category': m['assets__category']},
+                **{'cat_count': m['category_count']},
+                **{'req_count': r['req_count']},
+                **{'excess': m['category_count']-r['req_count'] if m['category_count']>r['req_count'] else "--"},
+                **{'shortfall': r['req_count']-m['category_count'] if r['req_count']>m['category_count'] else "--"}
+            })
+    merged_data = {d['category']: d for d in merged_data}.values()
+
+                
+               
+    print(order_category)   
+    print(requirement_category)
+    ctx['order_info']=order_info
+    ctx['order_category']=order_category
+    ctx['merged_data']=merged_data
+    return render(request,'excess_shortfall.html',ctx)

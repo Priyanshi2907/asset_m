@@ -133,6 +133,15 @@
                 {% endfor %}
             </select>
     </div>
+    <div class="assetform-input">
+        <label for="">Requirement.NO</label>
+            <select name="req_id" id="req_dropdown" style="width: 60%; height:40px; border-radius:5px" required>
+                <option value="">--Select--</option>
+                {% for m in requirement %}
+                    <option value="{{ m.id }}">{{ m.id }}</option>
+                {% endfor %}
+            </select>
+    </div>
      <div class="assetform-input">
         <label for="">NAME OF CONSIGNEE
 
