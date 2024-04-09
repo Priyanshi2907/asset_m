@@ -61,6 +61,12 @@ def orderdispatch_details (request, id):
         if i["duplicate_count"] > 1:
             print(i["asset_id__id"], " : duplicate asset")
     
+    distinct_box_number=OrderDetail.objects.filter(id=id).values_list('assets__box_number',flat=True).distinct()
+    print(distinct_box_number)
+    distinct_box_number_count=len(distinct_box_number)
+    print("count ",distinct_box_number_count)
+    # totalcount=OrderDetail.objects.filter(assets__box_number__in=distinct_box_number).count()
+    # print("count:",totalcount)
     customer = CustomerDetail.objects.all()
     ctx['customer'] = customer
     ctx['all_asset_of_an_order'] = all_asset_of_an_order
@@ -68,6 +74,7 @@ def orderdispatch_details (request, id):
     ctx['order_obj'] = order_obj
     ctx['comments'] = order_obj_comment
     ctx['attached_files'] = order_obj_files
+    ctx['distinct_box_number']=distinct_box_number
     
     return render(request,'orderdispatch_details.html', ctx)
 

@@ -28,7 +28,7 @@ class AssetMasterAccessories(models.Model):
     asset_tag = models.CharField(max_length=100, null=True, blank=True)
     status = models.CharField(max_length=100, null=True, blank=True)
     age = models.CharField(null=True, blank=True, max_length=100)
-    box_number = models.CharField(max_length=100, null=True, blank=True, default="")
+    box_number = models.IntegerField( null=True, blank=True, default="")
     last_service_date = models.DateField(null=True, blank=True, default=None)
     upcoming_service_date = models.DateField(null=True, blank=True, default=None)
 

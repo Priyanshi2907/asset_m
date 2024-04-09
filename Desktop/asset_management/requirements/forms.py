@@ -7,5 +7,5 @@ class ExcelUploadForm(forms.Form):
     r_orderstartdate=forms.DateField()
     r_orderdeploydate=forms.DateField()
     r_orderenddate=forms.DateField()
-    r_loc=forms.CharField(max_length=100)
+    r_loc=forms.CharField(max_length=10000)
     csv_file=forms.FileField(label="select and excel file")

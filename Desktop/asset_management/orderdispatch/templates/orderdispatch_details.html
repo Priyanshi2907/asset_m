@@ -16,7 +16,7 @@
         width:100%;
         height:100%;
         background-color: rgba(0,0,0,1);
-        opacity:0.9;
+        opacity:1;
         position:absolute;
         top: 0; 
         display:flex;
@@ -38,7 +38,7 @@
         transform: translateX(-50%);
     }
     .model-content{
-        width: 80%;
+        width: 60%;
         height: 44%;
         opacity: 1;
         background-color: white;
@@ -49,7 +49,11 @@
         position: relative;
         justify-content: space-around;
         margin: 20px;
+        overflow-y: auto;
+
     }
+    
+    
     .box{
        
         width:20px;
@@ -79,6 +83,11 @@
     
     input[type=checkbox]{
         background-color:green;
+      }
+
+      .scrollable-content {
+        max-height: 300px; /* Adjust as needed */
+        overflow-y: scroll;
       }
       
     
@@ -1145,23 +1154,27 @@ button.tablinks {
 {% comment %} model section {% endcomment %}
 <div class="bg-model">
     <div class="model-content">
-        <div class="d-flex justify-content-center">
-           <h4 style="text-align:center; ">Box No.</h4>
-        </div>
-        <div class="close">+</div>
         
-        {% for m in all_asset_of_an_order %}
-        <div class="checkbox-container">
-            <input type="checkbox" class="box" id="select-box{{ forloop.counter }}" onclick="enabled()" value="{{ forloop.counter }}">
-            <label for="select-box{{ forloop.counter }}" class="box-label">{{ forloop.counter }}</label>
-
-        </div>
-        {% endfor %}
+        <h4 style="text-align:center; ">Box No.</h4>                   
+      
+        <div><input type="checkbox"  id="checkboxall"> Select All</div>
+        <div class="close">+</div>
+       
+            {% for m in distinct_box_number %}
+            <div class="checkbox-container">
+                
+                <input type="checkbox" class="box" id="select-box{{ forloop.counter }}" onclick="enabled()" value="{{ forloop.counter }}">
+                <label for="select-box{{ forloop.counter }}" class="box-label">{{m}}</label>
+    
+            </div>
+            {% endfor %}
+     
         
     </div>
 </div>
 {% comment %} <input type="checkbox" class="btn-check" id="btn-check-2" checked autocomplete="off">
 <label class="btn btn-primary" for="btn-check-2">Checked</label> {% endcomment %}
+
 
 
 <script>
@@ -1180,16 +1193,26 @@ function(){
 
 {% comment %} box selector {% endcomment %}
 <script>
+    const checkboxall=document.getElementById('checkboxall');
+
     const boxes=document.querySelectorAll('.box');
     const devliverychallan=document.getElementById('printChallan');
     
-    boxes.forEach(box=>{
+        boxes.forEach(box=>{
+            
         box.addEventListener('click', () =>{
             box.classList.toggle('selected');
             const allBoxesSelected=Array.from(boxes).every(box=>box.classList.contains( 'selected'));
             devliverychallan.disabled = !allBoxesSelected;
         });
     });
+    checkboxall.addEventListener('click', () => { if (checkboxall.checked) { 
+        boxes.forEach(box => { box.checked = true; 
+            box.classList.add('selected'); }); 
+            devliverychallan.disabled = false; }
+             else { boxes.forEach(box => { box.checked = false; 
+                box.classList.remove('selected'); });
+                 devliverychallan.disabled = true; } });
 
 </script>
 <script>

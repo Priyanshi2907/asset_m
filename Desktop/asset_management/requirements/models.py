@@ -15,7 +15,7 @@ class RequirementDetail(models.Model):
     r_order_startdate = models.DateField(null=True, blank=True)
     r_order_depdate = models.DateField(null=True, blank=True)
     r_order_enddate = models.DateField(null=True, blank=True)
-    r_order_loc=models.CharField(max_length=100,blank=True, null=True)
+    r_order_loc=models.CharField(max_length=1000,blank=True, null=True)
 
 
     r_category = models.CharField(max_length=100, null=True, blank=True)
@@ -33,7 +33,7 @@ class RequirementDetail(models.Model):
     area = models.CharField(max_length=100, null=True, blank=True)
     fc_no = models.CharField(max_length=100, null=True, blank=True)
     status = models.CharField(max_length=100, null=True, blank=True)
-    box_number = models.CharField(max_length=100, null=True, blank=True, default="")
+    box_number = models.IntegerField( null=True, blank=True, default="")
 
 # class RequirementCust(models.Model):
 
