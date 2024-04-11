@@ -214,7 +214,7 @@ button.tablinks {
 </style>
 {% for m in orders_info %}
 <section class="assetdetail">
-    <button onclick="goToCustomerDetails(m.customer_id.id)" style="border: none; margin-bottom: 10px;
+    <button onclick="goback()" style="border: none; margin-bottom: 10px;
     background-color: transparent;">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" 
     style="fill: #6A1B9A;">
@@ -276,8 +276,7 @@ button.tablinks {
         <div class="assebutton" style="gap: 20px; display: flex;">
             <button id='addMoreAssets' data-toggle="modal" data-target="#myModal1" onclick="receiveData(1, '/asset_management/get_data/')">+ Add more assets</button> 
             <button id='approveButton' data-toggle="modal" data-target="#myModal2" 
-            onclick="alertForAcc(page = 1, url = '/asset_management/alert-for-accessories/', {{m.id}})"{% if request.user.email != 'ghoshshaibal@zoomcom.tv' %}disabled{% endif %}>Approve Order</button> 
-            
+            onclick="alertForAcc(page = 1, url = '/asset_management/alert-for-accessories/', {{m.id}}); if (['ghoshshaibal@zoomcom.tv', 'erp1@zoomcom.tv', 'erp2@zoomcom.tv'].indexOf('{{ request.user.email }}') === -1) { alert('You do not have permission to approve this order'); }" {% if request.user.email != 'ghoshshaibal@zoomcom.tv'  %} disabled{% endif %}>Approve Order</button>            
             {% comment %} <button id='approveButton' onclick="approveOrder(m.id)">Approve Order</button>  {% endcomment %}
             {% comment %} <button id='approveButton'>Approve Order</button>  {% endcomment %}
             <button id='cancelButton' onclick="cancelOrder({{m.id}})">Cancel booking</button>
@@ -847,8 +846,8 @@ button.tablinks {
 
 
     <script>
-        function goToCustomerDetails(id){
-            window.location.href = '/asset_management/customer-details/'+id+"/"
+        function goback(){
+            window.location.href = '/asset_management/confirmed-orders-list/'
         }
     </script>
 

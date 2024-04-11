@@ -35,7 +35,7 @@ class CustomerComment(models.Model):
     date_time = models.DateTimeField(auto_now=False, auto_now_add=False)
 
 class OrderDetail(models.Model):
-    from requirements.models import RequirementDetail
+    from requirements.models import RequirementDetail,RequirementCust
     class OrderStatus(models.IntegerChoices):
             BOOKED = 1,
             APPROVED = 2,
@@ -44,7 +44,7 @@ class OrderDetail(models.Model):
     assets = models.ManyToManyField(AssetMaster, related_name='order_details', blank=True)
     # order_id = models.UUIDField(editable=False, default=uuid.uuid4)
     customer_id = models.ForeignKey(CustomerDetail, on_delete=models.SET_NULL, null=True)
-    req_id = models.ForeignKey(RequirementDetail, on_delete=models.SET_NULL, null=True)
+    req_id = models.ForeignKey(RequirementCust, on_delete=models.SET_NULL, null=True)
     price = models.CharField(null=True, blank=True, max_length=50)
     # rent_out_date = models.DateField(null=True, blank=True)
     order_status = models.IntegerField(choices=OrderStatus.choices, default=OrderStatus.BOOKED)   

@@ -31,15 +31,15 @@ from django.forms.models import model_to_dict
 import random
 from asset_master.models import *
 from orders.models import *
-from .models import RequirementDetail
+from .models import RequirementDetail,RequirementCust
 from .forms import *
 
 # Create your views here.
 def requirement_report_main_page(request):
    ctx={}
 
-   requirement = RequirementDetail.objects.values('id','customer__id','customer__customer',
-    'r_order_startdate', 'r_order_enddate' )
+   requirement = RequirementCust.objects.values('id','r_cust_id','customer__id','customer__customer',
+    'r_order_startdate','r_order_depdate', 'r_order_enddate' )
 
    ctx['requirement']=requirement
 
@@ -48,25 +48,16 @@ def requirement_report_main_page(request):
 # requirement per customer
 def requirement_per_customer(request,id):
     ctx = {}
-
+    
     # Fetching the customer object by id
-    customer_obj = RequirementDetail.objects.filter(customer__id=id).values('r_category', 'r_subcategory', 'r_description', 
+    customer_obj = RequirementDetail.objects.filter(r_unique_id=id).values('r_category', 'r_subcategory', 'r_description', 
             'r_brand', 'r_modelno', 'r_serialno')
-
+    req_no=RequirementCust.objects.filter(r_cust_id=id).values('id','customer__customer')
     ctx['customer_obj'] = customer_obj
+    ctx['req_no'] = req_no
     print(customer_obj)
-    # ctx['all_asset_of_an_order'] = all_asset_of_an_order
-
+    
     return render(request, 'requirement_per_customer.html', ctx)
-
-    # ctx={}
-    # customer_obj = RequirementDetail.objects.filter(id=id).first()
-    # order_obj=OrderDetail.objects.filter(id=id)
-    # all_asset_of_an_order = RequirementDetail.objects.filter(id=customer_obj.id).values('r_category','r_subcategory',
-    #  'r_description','r_brand', 'r_modelno', 'r_serialno' )
-    # ctx['customer_obj']=customer_obj
-    # ctx['all_asset_of_an_order'] = all_asset_of_an_order
-    # return render(request,'requirement_per_customer.html',ctx)
 
 #create requirement asset form
 def requirement_asset_form(request):
@@ -77,7 +68,9 @@ def requirement_asset_form(request):
 
 #save requirement form
 def requirement_save_form(request):
+    
     if request.method=='POST':
+        print("helloooooo")
         form=ExcelUploadForm(request.POST,request.FILES)
         print("save req me aa gya hun")
         if form.is_valid():
@@ -85,15 +78,20 @@ def requirement_save_form(request):
             try:
 
                     customer=form.cleaned_data['customer']
+                    print(customer)
                     r_order_startdate =form .cleaned_data['r_orderstartdate']
                     r_order_depdate=form.cleaned_data['r_orderdeploydate']
                     r_order_enddate=form.cleaned_data['r_orderenddate']
                     r_order_loc=form.cleaned_data['r_loc']
                     csv_file=request.FILES['csv_file']
+                    print("yhn aa rhi")
+                    r_unique_id=request.POST['auto_id']
+                    
               
                     decoded_file = csv_file.read().decode('utf-8').splitlines()
                     csv_reader = csv.DictReader(decoded_file)
                     print(csv_reader)
+
         
                     for row in csv_reader:
                         print(row)
@@ -112,13 +110,11 @@ def requirement_save_form(request):
                         fc_no = row['FC NO.']
                         status = row['STATUS']
                         box_number=row['BOX NO.']
+                        print("box num ",row['BOX NO.'])
         
                         requirement=RequirementDetail(
                             customer=customer,
-                            r_order_startdate=r_order_startdate,
-                            r_order_depdate=r_order_depdate,
-                            r_order_enddate=r_order_enddate,
-                            r_order_loc=r_order_loc,
+                            r_unique_id=r_unique_id,
                             r_category=r_category,
                             r_subcategory=r_subcategory,
                             r_description=r_description,
@@ -135,7 +131,18 @@ def requirement_save_form(request):
                             box_number =box_number)
                          
                         requirement.save()
-                        print("me save ho gya hun")
+                        
+                    requirementcust=RequirementCust(
+                            customer=customer,
+                            r_cust_id=r_unique_id,
+                            r_order_startdate=r_order_startdate,
+                            r_order_depdate=r_order_depdate,
+                            r_order_enddate=r_order_enddate,
+                            r_order_loc=r_order_loc,
+                    ) 
+                    requirementcust.save()   
+
+                    print("me save ho gya hun")
                     return redirect ("requirement_report_main_page")
             except Exception as e:
                 print("error:------------",e)
@@ -144,44 +151,7 @@ def requirement_save_form(request):
        form=ExcelUploadForm()
     return render(request,'requirement_asset.html' , {'form':form})  
                
-
-    #    customer=request.POST.get('customer')
-    #    r_order_startdate=request.POST.get('out_date_and_time')
-    #    r_order_depdate=request.POST.get('deployment_date')
-    #    r_order_enddate=request.POST.get('return_date')
-    #    r_order_loc=request.POST.get('location')
-       
-    #    r_category=request.POST.get('category')
-    #    r_subcategory=request.POST.get('subcategory')
-    #    r_description=request.POST.get('description') 
-    #    r_modelno=request.POST.get('model_no')
-    #    r_brand=request.POST.get('brand')
-    #    r_serialno=request.POST.get('serial_no')
-      
-
-    #    data=RequirementDetail(
-    #         #    r_customer=customer,
-    #            r_order_startdate=r_order_startdate,
-    #            r_order_depdate=r_order_depdate,
-    #            r_order_enddate=r_order_enddate,
-    #            r_order_loc=r_order_loc,
-    #            r_category=r_category,
-    #            r_subcategory=r_subcategory,
-    #            r_description=r_description,
-    #            r_brand=r_brand,
-    #            r_modelno=r_modelno,
-    #            r_serialno=r_serialno,
-              
-           
-    #    )
-    #    data.save()
-    # return render(request,'requirement_asset.html')
-
-def query(request):
-    q="select * from RequirementDetail where customer_id =1"
-    result=RequirementDetail.objects.raw(q)
-    context={'result':result}
-    
+   
 
 #Confirmed order Export to CSV
 @login_required
@@ -191,11 +161,12 @@ def requirement_export_to_csv(request):
     
     queryset = RequirementDetail.objects.all()
     writer = csv.writer(response)
-    writer.writerow(["CATEGORY", "SUBCATEGORY", "DISCRIPTION","BRAND", "MODELNO","SERIALNO","QUANTITY"])
+    writer.writerow(["CATEGORY", "SUBCATEGORY", "DISCRIPTION","BRAND", "MODELNO","SERIALNO"])
     for obj in queryset:
-        writer.writerow([obj.r_category, obj.r_subcategory,  obj.r_description, obj.r_brand,obj.r_modelno,obj.r_serialno,obj.quantity])  
+        writer.writerow([obj.r_category, obj.r_subcategory,  obj.r_description, obj.r_brand,obj.r_modelno,obj.r_serialno])  
         
     return response
+    
 # import csv
 def upload_requirement_excel(request):
     print("requiremnt me jaa rha hun")

@@ -90,13 +90,75 @@
             <input type="text" name="r_loc" id="" >
         </div>
         <div class="assetform-input">
-            <label for="">upload Requirements</label>
+            <label for="">UPLOAD REQUIREMENT</label>
             <input type="file" name="csv_file" required>
         </div>
+        <input type="hidden" name="auto_id" id="auto_id">
         
     </div>
 
 </section>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function goback(){
+        window.location.href="/asset_management/requirement-report-main-page/"
+    }
+
+    $(document).ready(function() {
+        var autoId = generateUniqueId();
+        $('#auto_id').val(autoId);
+    });
+
+    // Function to generate a unique ID
+    function generateUniqueId() {
+        // This example generates a random string of characters as the ID
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var length = 10;
+        var randomString = '';
+        for (var i = 0; i < length; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return randomString;
+    }
+</script>
+
+
+
+<!-- Upload Excel File -->
+<script>
+    function uploadFiles() {
+        var fileInput = document.getElementById('fileInputs');
+        var file=fileInput.files[0]
+        
+        var formData = new FormData();
+        formData.append('csv_file', file);
+
+            $.ajax({
+                url: '/asset_management/upload_req/',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                success: function (response) {
+                    window.location.reload()
+
+                },
+                error: function (xhr, status, error) {
+                    window.location.reload()
+                }
+            });
+        }
+    
+
+</script>
+
+
+{% endblock content%}
 
 {% comment %} <div class="assetform-heading">
     <h4>Add Asset</h4>
@@ -136,43 +198,3 @@
     </div>
     
 </section> {% endcomment %}
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-    function goback(){
-        window.location.href="/asset_management/requirement-report-main-page/"
-    }
-</script>
-
-<!-- Upload Excel File -->
-<script>
-    function uploadFiles() {
-        var fileInput = document.getElementById('fileInputs');
-        var file=fileInput.files[0]
-        
-        var formData = new FormData();
-        formData.append('csv_file', file);
-
-            $.ajax({
-                url: '/asset_management/upload_req/',
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    "X-CSRFToken": "{{ csrf_token }}"
-                },
-                success: function (response) {
-                    window.location.reload()
-
-                },
-                error: function (xhr, status, error) {
-                    window.location.reload()
-                }
-            });
-        }
-    
-
-</script>
-
-
-{% endblock content%}

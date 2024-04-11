@@ -1052,6 +1052,13 @@ def asset_detail_view(request,id):
         asset_obj_files = AssetMasterAttachFile.objects.filter(asset_id=id)
         asset_obj_comment = AssetMasterComment.objects.filter(asset_id=id)
         customer = CustomerDetail.objects.all()
+        asset_master=AssetMaster.objects.get(id=id)
+        orderNumber = asset_master.order_details.all()
+        print("Order Details",orderNumber)
+        for m in  orderNumber:
+            print(m.id)
+        
+        ctx['orderNumber']=orderNumber
         ctx['comments'] = asset_obj_comment
         ctx['attached_files'] = asset_obj_files
         ctx['assets']=asset_obj

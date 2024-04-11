@@ -133,11 +133,12 @@
         <thead>
             <tr>
                 {% comment %} <th class="checkbox-column" style="border-radius: 10px 0 0 0;"><input type="checkbox" id="masterCheckbox" onclick="selectAllCheckboxes(this)"></th> {% endcomment %}
-                <th>Requirement.NO</th>
-                <th>Customer.NO</th>
-                <th>Customer name </th>
-                <th> Order Start Date</th>
-                <th>Order End Date</th>
+                <th>Requirement NO.</th>
+                <th>Customer NO.</th>
+                <th>Customer Name </th>
+                <th>Order Start Date</th>
+                <th>Order Deploy Date</th>
+                <th>Order Return Date</th>
                
                 {% comment %} <th>Order Status</th> {% endcomment %}
                 <!-- <th style="border-radius: 0 10px  0 0; cursor: pointer;"><img src="{% static 'images/sliders.svg' %}" alt=""></th> -->
@@ -147,20 +148,23 @@
         <tbody>
             {% for m in requirement %}
             <tr>
-              {% comment %} {% if forloop.counter|add:0 ==id %} {% endcomment %}
+              
                 {% comment %} <td class="checkbox-column"><input type="checkbox" name="order_id" value="{{ m.id }}"></td> {% endcomment %}
                 <td class="tbname">{{m.id}}</td>
                 <td class="tbname">{{m.customer__id}}</td>
-                <td class="tbname"><a href="/asset_management/requirement-per-customer/{{m.customer__id}}/">{{m.customer__customer}}</a></td>
-              {% comment %} {% else %}   {% endcomment %}
-                {% comment %} <td class="tbname">{{forloop.counter}}</td>
-                <td class="tbname"><a href="/asset_management/requirement-per-customer/">{{m.r_customer}}</a></td> {% endcomment %}
-              {% comment %} {%  endif %} {% endcomment %}
+                <td class="tbname"><a href="/asset_management/requirement-per-customer/{{m.r_cust_id}}/">{{m.customer__customer}}</a></td>
                 <td>
                     {% if m.r_order_startdate == none or m.r_order_startdate == "" %}
                         --
                     {% else %}
                         {{m.r_order_startdate|date:'d-m-Y'}}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if m.r_order_depdate == none or m.r_order_depdate == "" %}
+                        --
+                    {% else %}
+                        {{m.r_order_depdate|date:'d-m-Y'}}
                     {% endif %}
                 </td>
                 <td>
@@ -175,6 +179,9 @@
             <!-- Add more rows as needed -->
         </tbody>
     </table>
+</div>
+</section>
+<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
     {% comment %} <div class="pagidis">
         <div></div>
     <div class="card text-center" style="border: none;">
@@ -199,9 +206,7 @@
             {% endif %}
         </span>
     </div> {% endcomment %}
-</div>
-</section>
-<script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+
 
 {% comment %} <script>
     {% if messages %}

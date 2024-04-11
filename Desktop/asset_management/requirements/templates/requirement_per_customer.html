@@ -83,6 +83,13 @@
             span.select2-selection.select2-selection--single {
                 height:38px !important;
             }
+
+            .spinner-border-for-upload-excel {
+                height: 30px;
+                width: 30px;
+                color: #6A1B9A;
+                background-color: #6A1B9A;
+            }
 </style>
 
 <!-- Alert JS -->
@@ -94,10 +101,14 @@
     <button onclick="goback()" style="border: none; margin-bottom: 10px; background-color: transparent;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: #6A1B9A;transform: ;msFilter:;"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm5 11h-5v4l-5-5 5-5v4h5v2z"></path></svg></button>
 
     <div class="assetheaderbuttones">
-        {% comment %} {% for m in customer_obj%}
-        <h3>{{m.r_customer}}</h3>
-        {% endfor %} {% endcomment %}
-        
+        {% for m in req_no%}
+          <h3>{{m.id}}</h3>
+        {% endfor %}     
+    </div>
+    <div class="assetheaderbuttones">
+        {% for m in req_no%}
+          <h5>{{m.customer__customer}}</h5>
+        {% endfor %}      
     </div>
 </section>
 
@@ -161,21 +172,22 @@ $(document).ready(function() {
         $('#exportButton').html(spinner);
 
         $.ajax({
-            type: "POST",
+            type: "GET",    
             url: "/asset_management/requirement-exposed-to-csv/",
             data: { export_all: "export_all", csrfmiddlewaretoken: "{{ csrf_token }}" },
             success: function(data) {
-                var blob = new Blob([data], { type: 'text/csv' });
+                console.log("helloo")
+                var blob = new Blob([data]);
                 var link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
                 link.download = "Requirements.csv";
-                document.body.appendChild(link);
                 link.click();
-                $('#exportButton').html("EXPORT TO CSV");
+                window.location.reload();
+                //$('#exportButton').html("EXPORT TO CSV"); 
             },
             error: function(xhr, status, error) {
-                console.error(error);
-                $('#exportButton').html("EXPORT TO CSV");
+                //console.error(error);
+                //$('#exportButton').html("EXPORT TO CSV");
             }
         });
     });

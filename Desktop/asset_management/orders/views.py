@@ -612,7 +612,7 @@ def AssetMasterOrderPostView(request):
         selectedOrderIdsList = selectedOrderIds.split(",")
         request.session['selectedOrderIdsList'] = selectedOrderIdsList
         customer = CustomerDetail.objects.all()
-        requirement=RequirementDetail.objects.all()
+        requirement=RequirementCust.objects.all()
         ctx['customer'] = customer
         ctx['requirement']=requirement
         return render(request,'order_form.html', ctx)
@@ -623,7 +623,7 @@ def AssetMasterOrderPostView(request):
             customer_id = int(request.POST.get('customer_id'))
             req_id=int(request.POST.get('req_id'))
             customer_object = CustomerDetail.objects.filter(id=customer_id).first()
-            req_object=RequirementDetail.objects.filter(id=req_id).first()
+            req_object=RequirementCust.objects.filter(id=req_id).first()
 
             price = request.POST.get('price') or None
             deployment_date = request.POST.get('deployment_date') or None

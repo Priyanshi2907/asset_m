@@ -773,33 +773,39 @@ def excess_report_list(request):
 def excess_shortfall(request,id):
     merged_data=[]
     ctx={}
-    order_info=OrderDetail.objects.filter(id=id)
-    order_category=OrderDetail.objects.filter(id=id).values('assets__category').distinct().annotate(category_count=Count('assets__category'))
-    requirement_category=RequirementDetail.objects.values('r_category').distinct().annotate(req_count=Count('r_category'))
+    order_info = OrderDetail.objects.filter(id=id).all()
+    rcust = RequirementCust.objects.filter(id=order_info[0].req_id.id).values('r_cust_id')
+    rcust_id = rcust[0]['r_cust_id']
+    requirement_category = RequirementDetail.objects.filter(r_unique_id=rcust_id).values('r_category','r_description').distinct().annotate(req_count=Count('r_category'))
+    order_category = OrderDetail.objects.filter(id=id).values('assets__category','assets__description').distinct().annotate(category_count=Count('assets__category'))
+    print("order: ",order_category)
+    print("requiremnt: ",requirement_category)
+    
     for m in order_category:
         for r in requirement_category:
-            if r['r_category']==m['assets__category'] :
+            if m['assets__category'] == r['r_category'] and m['assets__description']==r['r_description']:
              merged_data.append({
                     **{'category':m['assets__category']}, 
                     **{'cat_count':m['category_count']},
                     **{'req_count':r['req_count']},
                     **{'excess':m['category_count']-r['req_count'] if m['category_count']>r['req_count'] else "--"},
                     **{'shortfall':r['req_count']-m['category_count'] if r['req_count']>m['category_count'] else "--"}
-    })
-            else:
-             merged_data.append({
-                **{'category': m['assets__category']},
-                **{'cat_count': m['category_count']},
-                **{'req_count': r['req_count']},
-                **{'excess': m['category_count']-r['req_count'] if m['category_count']>r['req_count'] else "--"},
-                **{'shortfall': r['req_count']-m['category_count'] if r['req_count']>m['category_count'] else "--"}
             })
-    merged_data = {d['category']: d for d in merged_data}.values()
+            
+        # else:
+        #      merged_data.append({
+        #         **{'category': m['assets__category']},
+        #         **{'cat_count': m['category_count']},
+        #         **{'req_count': 0},
+        #         **{'excess': 0},
+        #         **{'shortfall': 0}
+        #     })
+    
 
                 
                
-    print(order_category)   
-    print(requirement_category)
+    # print(order_category)   
+    # print(requirement_category)
     ctx['order_info']=order_info
     ctx['order_category']=order_category
     ctx['merged_data']=merged_data

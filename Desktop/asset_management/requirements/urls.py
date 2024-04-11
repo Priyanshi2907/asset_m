@@ -7,7 +7,7 @@ urlpatterns = [
 path("requirement-report-main-page/",requirement_report_main_page, name= "requirement_report_main_page"),
 
 #requirement per customer
-path("requirement-per-customer/<int:id>/",requirement_per_customer, name= "requirement_per_customer"),
+path("requirement-per-customer/<str:id>/",requirement_per_customer, name= "requirement_per_customer"),
 
 #requirement form
 path("requirement-asset/",requirement_asset_form, name= "requirement_asset"),

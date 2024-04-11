@@ -1,11 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, UserManager, PermissionsMixin
+
 import datetime
 
 
 
 class AssetMasterAccessories(models.Model):
-
+    
+         
     class RepairType(models.IntegerChoices):
             DEFAULT_TYPE = 10
             EXTERNAL_REPAIR = 20,
@@ -15,7 +17,7 @@ class AssetMasterAccessories(models.Model):
         PARENT = 101
         CHILD = 102
             
-                
+    #order=models.ForeignKey(Order)          
     area = models.CharField(max_length=100, null=True, blank=True)
     fc_no = models.CharField(max_length=100, null=True, blank=True)
     category = models.CharField(max_length=100, null=True, blank=True)
@@ -28,7 +30,7 @@ class AssetMasterAccessories(models.Model):
     asset_tag = models.CharField(max_length=100, null=True, blank=True)
     status = models.CharField(max_length=100, null=True, blank=True)
     age = models.CharField(null=True, blank=True, max_length=100)
-    box_number = models.IntegerField( null=True, blank=True, default="")
+    box_number = models.CharField(max_length=100, null=True, blank=True, default="")
     last_service_date = models.DateField(null=True, blank=True, default=None)
     upcoming_service_date = models.DateField(null=True, blank=True, default=None)
 
