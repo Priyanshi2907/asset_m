@@ -35,7 +35,7 @@ class CustomerComment(models.Model):
     date_time = models.DateTimeField(auto_now=False, auto_now_add=False)
 
 class OrderDetail(models.Model):
-    from requirements.models import RequirementDetail,RequirementCust
+    from requirements.models import RequirementCust
     class OrderStatus(models.IntegerChoices):
             BOOKED = 1,
             APPROVED = 2,

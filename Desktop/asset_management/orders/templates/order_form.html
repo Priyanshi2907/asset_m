@@ -154,24 +154,24 @@
             <span></span></label>
         <input id='invoice_number' type="text" name="invoice_number" >
     </div>
-    {% comment %} <div class="assetform-input">
-        <label for="">QUANTITY
-            <span></span></label>
-        <input id='quantity' type="number" name="quantity" id="" >
-    </div> {% endcomment %}
+    
     <div class="assetform-input">
-        <label for="">PRICE
-
-            <span></span></label>
+        <label for="">PRICE  <span></span></label>
         <input type="text"  name="price" id="" >
     </div>
     <div class="assetform-input">
-        <label for="">DEPLOYMENT DATE
-
-            <span></span></label>
+        <label for="">OUT DATE </label>
+        <input type="date"  name="out_date_and_time" id="" >
+    </div>
+    <div class="assetform-input">
+        <label for="">DEPLOYMENT DATE <span></span></label>
         <input type="date" name="deployment_date" id="" >
     </div>
     
+    <div class="assetform-input">
+        <label for="">RETURN DATE<span>*</span></label>
+        <input id="returnDate" type="date" name="return_date" required>
+    </div>
     
     <div class="assetform-input">
         <label for="">MODE OF DISPATCH
@@ -197,10 +197,7 @@
             <span></span></label>
         <input type="text"  name="order_to" id="" >
     </div>
-    <div class="assetform-input">
-        <label for="">OUT DATE </label>
-        <input type="date"  name="out_date_and_time" id="" >
-    </div>
+    
     <div class="assetform-input">
         <label for="">Maker Email<span>*</span> </label>
         <input type="text"  name="maker_email" id="" required>
@@ -266,10 +263,7 @@
         <input type="text"  name="website" id="" >
     </div>
 
-    <div class="assetform-input">
-        <label for="">RETURN DATE<span>*</span></label>
-        <input id="returnDate" type="date" name="return_date" required>
-    </div>
+    
     <script>
         var today = new Date().toISOString().split('T')[0];
         document.getElementById('returnDate').min = today;
