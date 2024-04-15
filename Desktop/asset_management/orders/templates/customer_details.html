@@ -176,7 +176,9 @@ button.tablinks {
     
 </style>
 <section class="assetdetail">
-    <button onclick="goToConfirmOrdersList()" style="border: none; margin-bottom: 10px; background-color: transparent;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: #6A1B9A;transform: msFilter"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm5 11h-5v4l-5-5 5-5v4h5v2z"></path></svg></button>
+    <button onclick="goToConfirmOrdersList()" style="border: none; margin-bottom: 10px; background-color: transparent;"><svg xmlns="http://www.w3.org/2000/svg" 
+        width="24" height="24" viewBox="0 0 24 24" style="fill: #6A1B9A;transform: msFilter">
+        <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm5 11h-5v4l-5-5 5-5v4h5v2z"></path></svg></button>
     <div class="assetheaderbuttones">
         
         <div class="uploadboxy">
@@ -861,27 +863,39 @@ button.tablinks {
 
 
 {% for m in customer_orders%}
+
 <script>
     var dispatchStatusElement = document.getElementById("dispatchStatus{{m.orderdetail__id}}");
     var orderStatus = {{ m.orderdetail__order_status }};
     var orderDispatched = {% if m.orderdetail__order_dispatch %}true{% else %}false{% endif %};
-
+    var user= "{{request.user.email}}";
     dispatchStatusElement.innerHTML = '';
 
     if (orderStatus == 2 && !orderDispatched) {
 
         var buttonElement = document.createElement("button");
+        if(user!= 'ghoshshaibal@zoomcom.tv'){
+        var spanElement = document.createElement("span");
+        spanElement.innerText = "Contact Admin to Dispatch";            //buttonElement.disabled= true;
+        dispatchStatusElement.style.backgroundColor = "#001AFF"
+        dispatchStatusElement.style.color = "white"
+        dispatchStatusElement.style.fontWeight = 700;
+        dispatchStatusElement.appendChild(spanElement);    
+        }else{
+        
         dispatchStatusElement.style.background = "#E5E8FF";
         buttonElement.style.border = "none";
         buttonElement.style.background = "none";
         buttonElement.style.fontWeight = 700;
         buttonElement.style.color = "#001AFF";
-        buttonElement.innerText = "Ready to dispatch";
+        buttonElement.innerText = "Ready to dispatch";    
         buttonElement.onclick = function () {
             order_dispatch({{ m.orderdetail__id }});
         };
         dispatchStatusElement.appendChild(buttonElement);
-    } else if (orderStatus == 4) {
+       }     
+    }
+        else if (orderStatus == 4) {
 
         var spanElement = document.createElement("span");
         spanElement.innerText = "Dispatched";

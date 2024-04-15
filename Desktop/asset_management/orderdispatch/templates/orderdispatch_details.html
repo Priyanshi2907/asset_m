@@ -292,6 +292,7 @@ button.tablinks {
             {% comment %} <button id="markOrderCompleteButton" class="hidden" onclick="showMarkOrderComplete()">Mark Order Complete</button> {% endcomment %}
             <button id="assetTransferButton" data-toggle="" data-target=".bd-example-modal-lg" class="hidden" href="#">Transfer</button>
             {% comment %} <button id="" data-toggle="modal" data-target=".bd-example-modal-lg" class="">Open Modal</button> {% endcomment %}
+            <button id="exportButton" onclick="generate_delivery_challan_csv({{m.id}})" disabled>EXPORT TO CSV </button>
             <button><a style="color:white" href="/asset_management/orders-info/{{m.id}}/">Order Details</a></button>
             <button id="printChallan" onclick="generate_delivery_challan_pdf({{m.id}})" disabled>Print Delivery Challan</button>
 
@@ -672,6 +673,84 @@ button.tablinks {
   
 
 <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% comment %} export csv {% endcomment %}
+<script>
+   function generate_delivery_challan_csv(id){
+
+        let spinner = ` <div id="spinner" style="width:200px; height:20px;">
+                            <div class="d-flex justify-content-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden"></span>
+                                </div>
+                            </div>
+                        </div> `
+        $('#exportButton').html(spinner)
+
+            var assetIds = []; 
+            $('input[name="assets__id"]:checked').each(function() {
+                assetIds.push($(this).val());
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "/asset_management/print-delivery-challan-csv/",
+                data: { id: id,
+                    assetIds: assetIds },
+                success: function (data) {
+                    var blob = new Blob([data]);
+                    var link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = "delivery_challan.csv";
+                    link.click();
+                    window.location.reload()
+                },
+                error: function (xhr, status, error) {
+                     console.error(error);
+                }
+            });
+        }
+    
+</script>
+
+{% comment %} print-delivery-challan {% endcomment %}
+
+<script>
+    function generate_delivery_challan_pdf(id) {
+        let spinner = ` <div id="spinner" style="width:200px; height:20px;">
+                            <div class="d-flex justify-content-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden"></span>
+                                </div>
+                            </div>
+                        </div> `
+        $('#printChallan').html(spinner)
+
+        var assetIds = []; 
+        $('input[name="assets__id"]:checked').each(function() {
+            assetIds.push($(this).val());
+        });
+
+            $.ajax({
+            type: "GET",
+            url: "/asset_management/print-delivery-challan/",
+            data: { id: id,
+                assetIds: assetIds },
+            success: function(response) {
+                var blob = new Blob([response], { type: 'application/pdf' });
+                var url = window.URL.createObjectURL(blob);
+                window.open(url);
+                setTimeout(function () {
+                    window.location.reload(); 
+                }, 1000);
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+                alert('Failed to generate PDF.');
+            }
+        });
+    }
+</script>
 
 <script>
     {% if messages %}
@@ -1114,42 +1193,6 @@ button.tablinks {
 
 
 
-<script>
-    function generate_delivery_challan_pdf(id) {
-        let spinner = ` <div id="spinner" style="width:200px; height:20px;">
-                            <div class="d-flex justify-content-center">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden"></span>
-                                </div>
-                            </div>
-                        </div> `
-        $('#printChallan').html(spinner)
-
-        var assetIds = []; 
-        $('input[name="assets__id"]:checked').each(function() {
-            assetIds.push($(this).val());
-        });
-
-            $.ajax({
-            type: "GET",
-            url: "/asset_management/print-delivery-challan/",
-            data: { id: id,
-                assetIds: assetIds },
-            success: function(response) {
-                var blob = new Blob([response], { type: 'application/pdf' });
-                var url = window.URL.createObjectURL(blob);
-                window.open(url);
-                setTimeout(function () {
-                    window.location.reload(); 
-                }, 1000);
-            },
-            error: function(xhr, status, error) {
-                console.error(error);
-                alert('Failed to generate PDF.');
-            }
-        });
-    }
-</script>
 
 {% comment %} model section {% endcomment %}
 <div class="bg-model">
@@ -1183,6 +1226,7 @@ function(){
     document.querySelector('.bg-model').style.display='flex';
 });
 </script>
+
 {% comment %} close function {% endcomment %}
 <script>
 document.querySelector('.close').addEventListener('click',
@@ -1197,6 +1241,7 @@ function(){
 
     const boxes=document.querySelectorAll('.box');
     const devliverychallan=document.getElementById('printChallan');
+    const deliverchallan_csv=document.getElementById('exportButton');
     
         boxes.forEach(box=>{
             
@@ -1204,23 +1249,34 @@ function(){
             box.classList.toggle('selected');
             const allBoxesSelected=Array.from(boxes).every(box=>box.classList.contains( 'selected'));
             devliverychallan.disabled = !allBoxesSelected;
+            deliverchallan_csv.disabled = !allBoxesSelected;
         });
     });
-    checkboxall.addEventListener('click', () => { if (checkboxall.checked) { 
-        boxes.forEach(box => { box.checked = true; 
-            box.classList.add('selected'); }); 
-            devliverychallan.disabled = false; }
-             else { boxes.forEach(box => { box.checked = false; 
-                box.classList.remove('selected'); });
-                 devliverychallan.disabled = true; } });
+    checkboxall.addEventListener('click', () => { 
+        if (checkboxall.checked) { 
+            boxes.forEach(box =>{
+            box.checked = true; 
+               box.classList.add('selected'); 
+            }); 
+            devliverychallan.disabled = false;
+            deliverchallan_csv.disabled = false; 
+        }
+        else { boxes.forEach(box => { 
+            box.checked = false; 
+            box.classList.remove('selected'); });
+            devliverychallan.disabled = true; 
+            deliverchallan_csv.disabled=true;
+            } 
+    });
 
 </script>
 <script>
     function enabled(){
         var check=document.getElementById('select-box');
-        var btn=document.getElementById('printChallan');
+        var btn_pdf=document.getElementById('printChallan');
+        var btn=document.getElementById('exportButton')
         if(check.checked){
-            btn.removeAttribute('disabled') ;
+            btn_pdf.removeAttribute('disabled') ;
         }
     }
 </script>

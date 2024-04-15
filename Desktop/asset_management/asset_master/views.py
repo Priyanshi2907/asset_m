@@ -902,10 +902,6 @@ class GetGroupWiseAssetAccessories(ListAPIView):
             if request.query_params.get('search_field'):
                 search_field = request.query_params.get('search_field')
 
-            
-
-
-            
             if request._request.GET.get('filter_value') and request._request.GET.get('filter_type'):
                 filter_value = request._request.GET.get('filter_value')
                 filter_type = request._request.GET.get('filter_type')

@@ -609,6 +609,7 @@ def AssetMasterOrderPostView(request):
     if request.method == 'GET':
         ctx = {}
         selectedOrderIds = request.GET.get('selectedOrderIds')
+        print("selectedorder id: ",selectedOrderIds)
         selectedOrderIdsList = selectedOrderIds.split(",")
         request.session['selectedOrderIdsList'] = selectedOrderIdsList
         customer = CustomerDetail.objects.all()
@@ -620,76 +621,93 @@ def AssetMasterOrderPostView(request):
     else:
         if request.method == 'POST':
             selectedOrderIdsList = request.session['selectedOrderIdsList']
+            print("see: ",selectedOrderIdsList)
             customer_id = int(request.POST.get('customer_id'))
             req_id=int(request.POST.get('req_id'))
             customer_object = CustomerDetail.objects.filter(id=customer_id).first()
             req_object=RequirementCust.objects.filter(id=req_id).first()
 
-            price = request.POST.get('price') or None
-            deployment_date = request.POST.get('deployment_date') or None
-            invoice_number = request.POST.get('invoice_number') or None
-            mode_of_dispatch = request.POST.get('mode_of_dispatch') or None
-            transportation = request.POST.get('transportation') or None
-            order_from = request.POST.get('order_from') or None
-            order_to = request.POST.get('order_to') or None
-            out_date_and_time = request.POST.get('out_date_and_time') or None
-            prepared_by_name = request.POST.get('prepared_by_name') or None
-            prepared_by_email = request.POST.get('prepared_by_email') or None
-            poc_at_venue_name = request.POST.get('poc_at_venue_name') or None
-            approver_email = request.POST.get('approver_email') or None
-            checker_email = request.POST.get('checker_email') or None
-            maker_email = request.POST.get('maker_email') or None
-            truck_details = request.POST.get('truck_details') or None
-            driver_details = request.POST.get('driver_details') or None
-            customer_name = request.POST.get('customer') or None
-            contact_details = request.POST.get('contact_details') or None
-            remarks = request.POST.get('remarks') or None
-            purpose = request.POST.get('purpose') or None
-            reason = request.POST.get('reason') or None
-            office_address = request.POST.get('office_address') or None
-            website = request.POST.get('website') or None
-            return_date = request.POST.get('return_date') or None
-            organization = request.POST.get('organization') or None
-            # quantity = request.POST.get('quantity') or None
-            name_of_consignee = request.POST.get('name_of_consignee') or None
-       
-            order_detail = OrderDetail.objects.create(
-                customer_id=customer_object,
-                req_id=req_object,
-                deployment_date=deployment_date,
-                invoice_number=invoice_number,
-                mode_of_dispatch=mode_of_dispatch,
-                transportation=transportation,
-                order_from=order_from,
-                price=price,
-                order_to=order_to,
-                out_date_and_time=out_date_and_time,
-                prepared_by_name= prepared_by_name,
-                prepared_by_email= prepared_by_email , 
-                poc_at_venue_name= poc_at_venue_name,
-                approver_email= approver_email,
-                checker_email= checker_email,
-                maker_email= maker_email,
-                truck_details=truck_details,
-                driver_details=driver_details,
-                customer=customer_name,
-                contact_details=contact_details,
-                remarks=remarks,
-                purpose=purpose,
-                reason=reason,
-                office_address=office_address,
-                website=website,
-                return_date=return_date,
-                organization=organization,
-                # quantity=quantity,
-                name_of_consignee=name_of_consignee,
-            )
-            asset_obj = AssetMaster.objects.filter(id__in=selectedOrderIdsList)
-            asset_obj.update(confirm_order=True)
-            order_detail.assets.set(asset_obj)
-            order_detail.save()
+            #prepare the bulk creation
+            orders_list=[]
+            for order_id  in selectedOrderIdsList:
+                order_data = {
+                    'customer_id': customer_object,
+                    'req_id': req_object,
+                    'deployment_date': request.POST.get('deployment_date') or None,
+                    'invoice_number': request.POST.get('invoice_number') or None,
+                    'mode_of_dispatch': request.POST.get('mode_of_dispatch') or None,
+                    'transportation': request.POST.get('transportation') or None,
+                    'order_from': request.POST.get('order_from') or None,
+                    'price': request.POST.get('price') or None,
+                    'order_to': request.POST.get('order_to') or None,
+                    'out_date_and_time': request.POST.get('out_date_and_time') or None,
+                    'prepared_by_name': request.POST.get('prepared_by_name') or None,
+                    'prepared_by_email': request.POST.get('prepared_by_email') or None,
+                    'poc_at_venue_name': request.POST.get('poc_at_venue_name') or None,
+                    'approver_email': request.POST.get('approver_email') or None,
+                    'checker_email': request.POST.get('checker_email') or None,
+                    'maker_email': request.POST.get('maker_email') or None,
+                    'truck_details': request.POST.get('truck_details') or None,
+                    'driver_details': request.POST.get('driver_details') or None,
+                    'customer': request.POST.get('customer') or None,
+                    'contact_details': request.POST.get('contact_details') or None,
+                    'remarks': request.POST.get('remarks') or None,
+                    'purpose': request.POST.get('purpose') or None,
+                    'reason': request.POST.get('reason') or None,
+                    'office_address': request.POST.get('office_address') or None,
+                    'website': request.POST.get('website') or None,
+                    'return_date': request.POST.get('return_date') or None,
+                    'organization': request.POST.get('organization') or None,
+                    'name_of_consignee': request.POST.get('name_of_consignee') or None,
+                }
+                orders_list.append(OrderDetail(**order_data))
+            
+            # bulk create order
+            order_details=OrderDetail.objects.bulk_create(orders_list)
 
-        return redirect('/asset_management/confirmed-orders-list/')
+            asset_objs = AssetMaster.objects.filter(id__in=selectedOrderIdsList)
+            asset_objs.update(confirm_order=True)
+            for order_detail,asset_obj in zip(order_details,asset_objs):
+                order_detail.assets.add(asset_obj)
+          
+            return redirect('/asset_management/confirmed-orders-list/')
+            # order_detail = OrderDetail.objects.create(
+            #     customer_id=customer_object,
+            #     req_id=req_object,
+            #     deployment_date=deployment_date,
+            #     invoice_number=invoice_number,
+            #     mode_of_dispatch=mode_of_dispatch,
+            #     transportation=transportation,
+            #     order_from=order_from,
+            #     price=price,
+            #     order_to=order_to,
+            #     out_date_and_time=out_date_and_time,
+            #     prepared_by_name= prepared_by_name,
+            #     prepared_by_email= prepared_by_email , 
+            #     poc_at_venue_name= poc_at_venue_name,
+            #     approver_email= approver_email,
+            #     checker_email= checker_email,
+            #     maker_email= maker_email,
+            #     truck_details=truck_details,
+            #     driver_details=driver_details,
+            #     customer=customer_name,
+            #     contact_details=contact_details,
+            #     remarks=remarks,
+            #     purpose=purpose,
+            #     reason=reason,
+            #     office_address=office_address,
+            #     website=website,
+            #     return_date=return_date,
+            #     organization=organization,
+            #     # quantity=quantity,
+            #     name_of_consignee=name_of_consignee,
+            # )
+            # asset_obj = AssetMaster.objects.filter(id__in=selectedOrderIdsList).update(confirm_order=True)
+            
+            # order_detail.assets.set(asset_obj)
+            # order_detail.save()
+
+        
 
 
 

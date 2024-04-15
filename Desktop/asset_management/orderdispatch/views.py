@@ -36,6 +36,7 @@ from reportlab.platypus.flowables import KeepTogether
 from datetime import datetime
 base_url = settings.BASE_URL
 from django.db.models import Count
+import csv
 
 
 #Order dispatch details
@@ -592,5 +593,42 @@ def print_delivery_challan_pdf(request):
 
     
     return FileResponse(buf, as_attachment=True, filename='delivery_challan.pdf')
+
+
+def delivery_challan_csv(request):
+    
+    id = request.GET.get('id')
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="delivery_challan.csv"'
+    
+    if len(request.GET.getlist('assetIds[]')) > 0:
+        asset_ids = request.GET.getlist('assetIds[]')
+        customer_obj = list(OrderDetail.objects.filter(id=id, assets__id__in=asset_ids).values_list(
+                                                                        "assets__box_number",
+                                                                        "assets__category",
+                                                                        "assets__description",
+                                                                        "assets__brand",
+                                                                        "assets__model_no", 
+                                                                        "assets__serial_no",
+                                                                        "remarks"))
+    else:
+        customer_obj = list(OrderDetail.objects.filter(id=id).values_list(
+                                                                        "assets__box_number",
+                                                                        "assets__category",
+                                                                        "assets__description",
+                                                                        "assets__brand",
+                                                                        "assets__model_no", 
+                                                                        "assets__serial_no",
+                                                                        "remarks"))
+        
+    # customer_obj.insert(0, queryset_values)
+
+    writer = csv.writer(response)
+    writer.writerow(["BOX_NUMBER", "CATEGORY", "DESCRIPTION", "BRAND", "MODEL_NO", "SERIAL_NO",
+                         "REMARKS"])
+    
+    for row in customer_obj:
+        writer.writerow(row)
+    return response
 
 

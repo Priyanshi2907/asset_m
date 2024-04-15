@@ -1128,9 +1128,15 @@ button.tablinks {
                                 <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2"/>
                                 <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z"/>
                               </svg>
-                            <p>This Asset is not present in any Repairs.
-
-                            </p>
+                                {% for m in assets %}     
+                                    {% if m.asset_status == 'sent_for_repair' and m.repair_type == 30 %}
+                                    <p>The Asset is present in Internal Repair</p>
+                        
+                                    {% elif m.asset_status == 'sent_for_repair' and m.repair_type == 20 %}
+                                    <p>The Asset is present in External Repair</p>
+                                    {% endif%}
+                                {% endfor %}
+                            
             
                         </div> 
                        
@@ -1667,21 +1673,7 @@ function uploadFile(id) {
             var buttonText = 'Add';
             var buttonColor = '#00A3C7';
             var buttonDisabled = ''; 
-
-            if (results[i].add_to_order === true && results[i].asset_status==='rented_out') {
-                buttonText = 'Booked';
-                buttonColor = '#37A80D'; 
-                fontWeight = '700';
-
-            }
-            else if (results[i].confirm_order === false && results[i].asset_status==='sent_for_repair') {
-                buttonText = 'On_Repair';
-                buttonColor = '#ffc107'; 
-                fontWeight = '700';
-                buttonDisabled = 'disabled';  
-
-            }
-
+            
             var buttonId = 'addButtonId_' + results[i].id;
             var row = '<tr>' +
                 '<td><button id="' + buttonId + '" style="background: none; font-weight:700; border: none; color: ' + buttonColor + ';" onclick="addAssetToThisOrder(' + results[i].id + ', \'' + buttonId + '\')" ' + buttonDisabled + ' >' + buttonText + '</button></td>' +
@@ -1695,24 +1687,74 @@ function uploadFile(id) {
 
             tableBody.innerHTML += row;
         }
+
+        for(var i=0;i<results.length;i++){
+            if (results[i].add_to_order === true && results[i].asset_status==='rented_out') {
+                buttonText = 'Booked';
+                buttonColor = '#37A80D'; 
+                fontWeight = '700';
+
+            }
+            else if (results[i].confirm_order === false && results[i].asset_status==='sent_for_repair') {
+                buttonText = 'On_Repair';
+                buttonColor = '#ffc107'; 
+                fontWeight = '700';
+                buttonDisabled = 'disabled';  
+
+            }  
+            var buttonId = 'addButtonId_' + results[i].id;
+            var row = '<tr>' +
+                '<td><button id="' + buttonId + '" style="background: none; font-weight:700; border: none; color: ' + buttonColor + ';" onclick="addAssetToThisOrder(' + results[i].id + ', \'' + buttonId + '\')" ' + buttonDisabled + ' >' + buttonText + '</button></td>' +
+                '<td>' + (results[i].category === 'nan' ? '--' : results[i].category) + '</td>' +
+                '<td>' + results[i].description + '</td>' +
+                '<td>' + results[i].brand + '</td>' +
+                '<td>' + results[i].model_no + '</td>' +
+                '<td>' + results[i].serial_no + '</td>' +
+                '<td>' + results[i].owner + '</td>' +
+                '</tr>';
+
+            tableBody.innerHTML += row;
+
+        }
     }
 
     function updatePaginationLinks(data) {
         var paginationLinks = document.getElementById('paginationLinks');
         paginationLinks.innerHTML = '';
-
+        var firstpage=1;
+        var totalitem=data.count;
+        var itemsperpage=20;
+        var totalpage=Math.ceil(totalitem/itemsperpage);
+        var lastPage=totalpage
+        console.log("total pages:",totalpage,"total item:",totalitem);
+        console.log(data)
         if (data.previous) {
             var previousPage = new URL(data.previous);
             var page = previousPage.searchParams.get('page');
             // Check if the 'page' parameter is present, and if not, set it to 1
             page = page ? page : 1;
+            paginationLinks.innerHTML += '<a href="javascript:void(0);" class="paginate-link" data-page="' + firstpage + '"> 1 </a>';
+
             paginationLinks.innerHTML += '<a href="javascript:void(0);" class="paginate-link" data-page="' + page + '">Previous  </a>';
         }
 
         if (data.next) {
             var nextPage = new URL(data.next);
             var page = nextPage.searchParams.get('page');
-            paginationLinks.innerHTML += '<a href="javascript:void(0);" class="paginate-link" data-page="' + page + '" style="margin-left:20px;">    Next </a>';
+            paginationLinks.innerHTML += '<a href="javascript:void(0);" class="paginate-link" data-page="' + page + '" style="margin-left:20px;">    Next </a>'
+            '<a href="javascript:void(0);" class="paginate-link" data-page="' + totalpage + '" style="margin-left:20px;">    Last </a>';
+        
+        }
+        if(page<totalpage){
+            paginationLinks.innerHTML += '<a href="javascript:void(0);" class="paginate-link" data-page="' + totalpage + '" style="margin-left:20px;">    Last </a>';
+
+        }
+        console.log("Current Page: " + page);
+        if (data.last) {
+            console.log(data.last);
+            var lastPage = new URL(data.last);
+            var page = lastPage.searchParams.get('page');
+            paginationLinks.innerHTML += '<a href="javascript:void(0);" class="paginate-link" data-page="' + page + '" style="margin-left:20px;">    hii </a>';
         }
     }
 

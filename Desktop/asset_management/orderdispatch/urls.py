@@ -11,4 +11,5 @@ urlpatterns = [
     path('approve-tranfer-request/', approve_transfer_request, name='approve_transfer_request'),
     path('dispatch-order-search/', autocomplete_search_dispatch_orders, name='autocomplete_search_dispatch_orders'),
     path('print-delivery-challan/', print_delivery_challan_pdf, name='print_delivery_challan_pdf'),
+    path('print-delivery-challan-csv/', delivery_challan_csv, name='print_delivery_challan_csv'),
 ]
