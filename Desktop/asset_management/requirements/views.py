@@ -50,9 +50,9 @@ def requirement_per_customer(request,id):
     ctx = {}
     
     # Fetching the customer object by id
-    customer_obj = RequirementDetail.objects.filter(r_unique_id=id).values('r_category', 'r_subcategory', 'r_description', 
+    customer_obj = RequirementDetail.objects.filter(r_unique_id=id).values('r_unique_id','r_category', 'r_subcategory', 'r_description', 
             'r_brand', 'r_modelno', 'r_serialno')
-    req_no=RequirementCust.objects.filter(r_cust_id=id).values('id','customer__customer')
+    req_no=RequirementCust.objects.filter(r_cust_id=id).values('r_cust_id','id','customer__customer')
     ctx['customer_obj'] = customer_obj
     ctx['req_no'] = req_no
     print(customer_obj)
@@ -156,14 +156,33 @@ def requirement_save_form(request):
 #Confirmed order Export to CSV
 @login_required
 def requirement_export_to_csv(request):
+    r_unique_id=request.GET.get('r_unique_id')
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="exported_data.csv"'
-    
-    queryset = RequirementDetail.objects.all()
+    if len(request.GET.getlist(' r_assetIds'))>0:
+         r_assetIds=request.GET.getlist(' r_assetIds[]')
+         queryset = list(RequirementDetail.objects.filter(r_unique_id=r_unique_id,RequirementDetail__r_unique_id__in=r_assetIds).values_list(
+                                                                                                                                    'r_category',
+                                                                                                                                    'r_subcategory',
+                                                                                                                                    'r_description',
+                                                                                                                                    'r_brand',
+                                                                                                                                    'r_modelno',
+                                                                                                                                    'r_serialno'))      
+    else:
+         queryset = list(RequirementDetail.objects.filter(r_unique_id=r_unique_id,).values_list(
+                                                                                    'r_category',
+                                                                                    'r_subcategory',
+                                                                                    'r_description',
+                                                                                    'r_brand',
+                                                                                    'r_modelno',
+                                                                                    'r_serialno')) 
+         
+                                                                                                                                                                                                                                                                               
+    print(queryset)                                                                                                                                                                                                                                                                                    
     writer = csv.writer(response)
     writer.writerow(["CATEGORY", "SUBCATEGORY", "DISCRIPTION","BRAND", "MODELNO","SERIALNO"])
     for obj in queryset:
-        writer.writerow([obj.r_category, obj.r_subcategory,  obj.r_description, obj.r_brand,obj.r_modelno,obj.r_serialno])  
+        writer.writerow(obj)  
         
     return response
     

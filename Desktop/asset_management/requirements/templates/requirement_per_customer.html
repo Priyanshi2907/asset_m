@@ -111,12 +111,11 @@
         {% endfor %}      
     </div>
 </section>
-
+{% for m in req_no%}
 <section class="assest-container-table">
-    <button id="exportButton">
-        EXPORT TO CSV
-    </button>
+    <button id="exportButton" onclick="exportcsv('{{m.r_cust_id}}')" >EXPORT TO CSV </button>
 
+{% endfor %}   
     <table class="table">
         <thead>
             <tr>
@@ -158,11 +157,12 @@
 </script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 {% comment %} for exporting to csv {% endcomment %}
 <script>
-$(document).ready(function() {
-    
-    $("#exportButton").on("click", function() {
+    function exportcsv(r_unique_id){
+        console.log('coming here')
         let spinner = `
         <div id="spinner" class="d-flex justify-content-center">
             <div class="spinner-border" role="status">
@@ -171,10 +171,17 @@ $(document).ready(function() {
         </div>`;
         $('#exportButton').html(spinner);
 
+        var r_assetIds = []; 
+        $('input[name="RequirementDetail__r_unique_id"]').each(function() {
+            r_assetIds.push($(this).val());
+        });
+
         $.ajax({
             type: "GET",    
             url: "/asset_management/requirement-exposed-to-csv/",
-            data: { export_all: "export_all", csrfmiddlewaretoken: "{{ csrf_token }}" },
+            data: { r_unique_id:r_unique_id, 
+                r_assetIds:r_assetIds,
+                csrfmiddlewaretoken: "{{ csrf_token }}" },
             success: function(data) {
                 console.log("helloo")
                 var blob = new Blob([data]);
@@ -186,10 +193,9 @@ $(document).ready(function() {
                 //$('#exportButton').html("EXPORT TO CSV"); 
             },
             error: function(xhr, status, error) {
-                //console.error(error);
-                //$('#exportButton').html("EXPORT TO CSV");
+                console.error(error);               
             }
         });
-    });
-});
+    }
+
 </script>
