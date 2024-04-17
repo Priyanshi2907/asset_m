@@ -668,6 +668,7 @@ def AssetMasterOrderPostView(request):
             asset_objs = AssetMaster.objects.filter(id__in=selectedOrderIdsList)
             asset_objs.update(confirm_order=True)
             for order_detail in order_details:
+                order_detail.save()
                 print (order_detail)
                 order_detail.assets.set(asset_objs)
           
