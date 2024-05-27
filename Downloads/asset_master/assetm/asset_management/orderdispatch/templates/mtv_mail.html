@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Move To Inventory Email</title>
+</head>
+<body>
+    <p>Hi Zoom Communication Team,</p>
+    <p>The Asset has been Moved To Inventory prior the return date :  “{{returndate}}”  by  “{{user_email_id}}”.</p>
+    <p>Asset  details are -</p>
+    <ul>
+        {% for asset_obj in asset_objs %}
+            <li>Category: {{ asset_obj.category }}</li>
+            <li>Description: {{ asset_obj.description }}</li>
+            <li>Model No: {{ asset_obj.model_no }}</li>
+            <li>Serial no: {{ asset_obj.serial_no }}</li>
+            <li>Brand: {{ asset_obj.brand }}</li>
+        {% endfor %}
+    </ul>
+    <p>Please Log in to ERP Portal for more details-</p>
+    <p>Thanks</p>
+    
+</body>
+</html>

@@ -1,0 +1,200 @@
+{% load static%}
+
+{% include 'base_dashboard.html' %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/dropzone.min.css">
+
+<!-- Include FontAwesome CSS (you can change the version if needed) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.2/min/dropzone.min.js"></script>
+<script type='text/javascript' src="{% static 'validations.js' %}"></script>
+
+
+
+<section class="assetdetail">
+    <button onclick="goback()" style="border: none; margin-bottom: 10px; background-color: transparent;"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: #6A1B9A;/*transform;msFilter:;*/"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm5 11h-5v4l-5-5 5-5v4h5v2z"></path></svg></button>
+    <div class="assetheaderbuttones">
+        <h1>Requirement form</h1>
+        
+        <form action="{% url 'save-requirement-form' %}" method="post" enctype="multipart/form-data">
+            {%csrf_token%}
+            {{form.errors}}
+    
+         <div class="assebutton" style="gap: 20px; display: flex;">
+            <button type="submit">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                width="20" height="20" viewBox="0 0 24 24"
+                style="fill: #fff;/*transform: ;msFilter:;*/ margin-right: 5px;">
+                <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path>
+                <path d="M9.999 13.587 7.7 11.292l-1.412 1.416 3.713 3.705 6.706-6.706-1.414-1.414z"></path>
+                </svg>Save
+            </button>
+
+            
+            <div class="asset-tablebtn">
+                
+                    <button style="height: 45px;">
+                        <a href="">CANCEL</a>
+                    </button>
+                
+            </div>
+            
+    
+        </div>
+       
+    </div>
+    
+
+</section>
+
+<div class="assetform-heading">
+    <h4>Enter the details for requirement of asset</h4>
+    
+        
+</div>
+
+<section class="assetform-data ">
+
+    <div class="assetform-formtable">
+      
+        <div class="assetform-input">
+            <label for="">CUSTOMER</label>
+                <select name="customer" id="customer_dropdown" style="width: 60%; height:40px; border-radius:5px" required>
+                    <option value="">--Select--</option>
+                    {% for m in customer %}
+                        <option value="{{ m.id }}">{{ m.customer }}</option>
+                    {% endfor %}
+                </select>
+        </div>
+        <div class="assetform-input">
+            <label for="">ORDER START DATE </label>
+            <input type="date"  name="r_orderstartdate" id="" required>
+        </div>
+        <div class="assetform-input">
+            <label for="">ORDER DEPLOYMENT DATE</label>
+            <input type="date" name="r_orderdeploydate" id="" >
+        </div>
+        <div class="assetform-input">
+            <label for="">ORDER RETURN DATE<span></span></label>
+            <input  type="date"   name="r_orderenddate" id="returnDate" >
+        </div>
+        <script>
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById('returnDate').min = today;
+            console.log(today,"today")
+        </script>
+        <div class="assetform-input">
+            <label for="">ORDER LOCATION</label>
+            <input type="text" name="r_loc" id="" >
+        </div>
+        <div class="assetform-input">
+            <label for="">UPLOAD REQUIREMENT</label>
+            <input type="file" name="csv_file" required>
+        </div>
+        <input type="hidden" name="auto_id" id="auto_id">
+        
+    </div>
+
+</section>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function goback(){
+        window.location.href="/asset_management/requirement-report-main-page/"
+    }
+
+    $(document).ready(function() {
+        var autoId = generateUniqueId();
+        $('#auto_id').val(autoId);
+    });
+
+    // Function to generate a unique ID
+    function generateUniqueId() {
+        // This example generates a random string of characters as the ID
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var length = 10;
+        var randomString = '';
+        for (var i = 0; i < length; i++) {
+            randomString += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return randomString;
+    }
+</script>
+
+
+
+<!-- Upload Excel File -->
+<script>
+    function uploadFiles() {
+        var fileInput = document.getElementById('fileInputs');
+        var file=fileInput.files[0]
+        
+        var formData = new FormData();
+        formData.append('csv_file', file);
+
+            $.ajax({
+                url: '/asset_management/upload_req/',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                success: function (response) {
+                    window.location.reload()
+
+                },
+                error: function (xhr, status, error) {
+                    window.location.reload()
+                }
+            });
+        }
+    
+
+</script>
+
+
+{% endblock content%}
+
+{% comment %} <div class="assetform-heading">
+    <h4>Add Asset</h4>
+</div>
+
+<div></div>
+<section class="assetform-data ">
+
+    <div class="assetform-formtable">
+
+        <div class="assetform-input">
+            <label for="">Category<span>*</span></label>
+            <input type="text" name="category" id="" >
+        </div>
+        <div class="assetform-input">
+            <label for="">Sub Category<span>*</span></label>
+            <input type="text"  name="subcategory" id="" >
+        </div>
+        <div class="assetform-input">
+            <label for="">Description<span>*</span></label>
+            <input type="text" name="description" id="" >
+        </div>
+        <div class="assetform-input">
+            <label for="">Model Number<span>*</span></label>
+            <input type="text" name="model_no" id="" >
+        </div>
+    
+        <div class="assetform-input">
+            <label for="">Brand<span>*</span></label>
+            <input type="text" name="brand" id="" >
+        </div>
+        <div class="assetform-input">
+            <label for="">Serial Number<span>*</span></label>
+            <input type="text"  name="serial_no" id="" >
+        </div>
+        
+    </div>
+    
+</section> {% endcomment %}
